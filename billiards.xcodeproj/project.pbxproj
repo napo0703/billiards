@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		363FF1161DA3C5EC00ABBFC9 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 363FF1151DA3C5EC00ABBFC9 /* main.cpp */; };
+		363FF11F1DA3C5FF00ABBFC9 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363FF11D1DA3C5FF00ABBFC9 /* GLUT.framework */; };
+		363FF1201DA3C5FF00ABBFC9 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 363FF11E1DA3C5FF00ABBFC9 /* OpenGL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,8 @@
 /* Begin PBXFileReference section */
 		363FF1121DA3C5EC00ABBFC9 /* billiards */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = billiards; sourceTree = BUILT_PRODUCTS_DIR; };
 		363FF1151DA3C5EC00ABBFC9 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		363FF11D1DA3C5FF00ABBFC9 /* GLUT.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GLUT.framework; path = System/Library/Frameworks/GLUT.framework; sourceTree = SDKROOT; };
+		363FF11E1DA3C5FF00ABBFC9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,6 +36,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				363FF11F1DA3C5FF00ABBFC9 /* GLUT.framework in Frameworks */,
+				363FF1201DA3C5FF00ABBFC9 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -43,6 +49,7 @@
 			children = (
 				363FF1141DA3C5EC00ABBFC9 /* billiards */,
 				363FF1131DA3C5EC00ABBFC9 /* Products */,
+				363FF11C1DA3C5FF00ABBFC9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -60,6 +67,15 @@
 				363FF1151DA3C5EC00ABBFC9 /* main.cpp */,
 			);
 			path = billiards;
+			sourceTree = "<group>";
+		};
+		363FF11C1DA3C5FF00ABBFC9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				363FF11D1DA3C5FF00ABBFC9 /* GLUT.framework */,
+				363FF11E1DA3C5FF00ABBFC9 /* OpenGL.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,7 +183,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -208,7 +224,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.12;
+				MACOSX_DEPLOYMENT_TARGET = 10.8;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = macosx;
 			};
