@@ -2,9 +2,9 @@
 #include <GLUT/GLUT.h>
 
 int WindowPositionX = 200;
-int WindowPositionY = 200;
-int WindowWidth = 512;
-int WindowHeight = 512;
+int WindowPositionY = 100;
+int WindowWidth = 800;
+int WindowHeight = 600;
 char WindowTitle[] = "billiards";
 GLdouble vertex[][3] = {
     { 0.0, 0.0, 0.0 },
@@ -30,6 +30,7 @@ void idle(void);
 void display(void);
 void ground(void);
 void table(double a, double b, double c, double x, double y, double z);
+void sphere(void);
 
 int main(int argc, char *argv[]){
     glutInit(&argc, argv);
@@ -52,9 +53,9 @@ void init(void){
     glLoadIdentity();
     gluPerspective(30.0, (double)WindowWidth/(double)WindowHeight, 0.1, 1000.0);
     gluLookAt(
-              0.0, -150.0, 100.0, // 視点の位置
-              0.0, 0.0, 10.0,    // 視界の中心位置の参照点座標
-              0.0, 0.0, 2.0);    // 視界の上方向のベクトル
+              0.0, -120.0, 50.0, // 視点の位置
+              0.0, 0.0, 10.0,     // 視界の中心位置の参照点座標
+              0.0, 0.0, 2.0);     // 視界の上方向のベクトル
 }
 
 void idle(){
@@ -66,10 +67,10 @@ void display(void) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glViewport(0, 0, WindowWidth, WindowHeight);
-    table(50.0, 100.0, 1.0, 0.0, 0.0, 20.0);
     glEnd();
     glPopMatrix();
-    
+    table(50.0, 100.0, 1.0, 0.0, 0.0, 20.0);
+    sphere();
     ground();
     glutSwapBuffers();
 }
@@ -121,6 +122,7 @@ void table(double a, double b, double c, double x, double y, double z){
         { 0.0,-1.0, 0.0 },
         { 0.0, 1.0, 0.0 }
     };
+    glColor3d(0.5, 1.0, 0.5);
     glPushMatrix();
     glTranslated( x, y, z);
     glBegin(GL_QUADS);
@@ -131,5 +133,14 @@ void table(double a, double b, double c, double x, double y, double z){
         }
     }
     glEnd();
+    glPopMatrix();
+}
+
+// 球
+void sphere(void) {
+    glPushMatrix();
+    glColor3d(1.0, 0.0, 0.0);
+    glTranslated(0.0, 10.0, 25.0);
+    glutSolidSphere(2.0, 20, 20);  // 半径, Z軸まわりの分割数, Z軸に沿った分割数
     glPopMatrix();
 }
