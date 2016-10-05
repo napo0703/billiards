@@ -29,7 +29,7 @@ void init(void);
 void idle(void);
 void display(void);
 void ground(void);
-void table(double a, double b, double c, double x, double y, double z);
+void table(void);
 void sphere(void);
 
 int main(int argc, char *argv[]){
@@ -58,7 +58,7 @@ void init(void){
               0.0, 0.0, 2.0);     // 視界の上方向のベクトル
 }
 
-void idle(){
+void idle(void){
     glutPostRedisplay();
 }
 
@@ -69,7 +69,7 @@ void display(void) {
     glViewport(0, 0, WindowWidth, WindowHeight);
     glEnd();
     glPopMatrix();
-    table(50.0, 100.0, 1.0, 0.0, 0.0, 20.0);
+    table();
     sphere();
     ground();
     glutSwapBuffers();
@@ -93,16 +93,16 @@ void ground(void) {
 }
 
 //テーブル
-void table(double a, double b, double c, double x, double y, double z){
+void table(void){
     GLdouble vertex[][3] = {
-        { -a/2.0, -b/2.0, -c/2.0 },
-        {  a/2.0, -b/2.0, -c/2.0 },
-        {  a/2.0,  b/2.0, -c/2.0 },
-        { -a/2.0,  b/2.0, -c/2.0 },
-        { -a/2.0, -b/2.0,  c/2.0 },
-        {  a/2.0, -b/2.0,  c/2.0 },
-        {  a/2.0,  b/2.0,  c/2.0 },
-        { -a/2.0,  b/2.0,  c/2.0 }
+        { -25.0, -50.0, -0.5 },
+        {  25.0, -50.0, -0.5 },
+        {  25.0,  50.0, -0.5 },
+        { -25.0,  50.0, -0.5 },
+        { -25.0, -50.0,  0.5 },
+        {  25.0, -50.0,  0.5 },
+        {  25.0,  50.0,  0.5 },
+        { -25.0,  50.0,  0.5 }
     };
     //面の定義
     int face[][4] = {
@@ -124,7 +124,7 @@ void table(double a, double b, double c, double x, double y, double z){
     };
     glColor3d(0.5, 1.0, 0.5);
     glPushMatrix();
-    glTranslated( x, y, z);
+    glTranslated(0.0, 0.0, 20.0);
     glBegin(GL_QUADS);
     for (int j = 0; j < 6; ++j) {
         glNormal3dv(normal[j]);
