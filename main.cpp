@@ -48,14 +48,14 @@ int main(int argc, char *argv[]){
 void init(void){
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glEnable(GL_DEPTH_TEST);
-    
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     gluPerspective(30.0, (double)WindowWidth/(double)WindowHeight, 0.1, 1000.0);
     gluLookAt(
-              0.0, -120.0, 50.0, // 視点の位置
-              0.0, 0.0, 10.0,     // 視界の中心位置の参照点座標
-              0.0, 0.0, 2.0);     // 視界の上方向のベクトル
+        0.0, -120.0, 50.0, // 視点の位置
+        0.0, 0.0, 10.0,     // 視界の中心位置の参照点座標
+        0.0, 0.0, 2.0);     // 視界の上方向のベクトル
 }
 
 void idle(void){
