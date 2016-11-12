@@ -1,38 +1,33 @@
-#include <OpenGL/OpenGL.h>
-#include <GLUT/GLUT.h>
+#ifdef __APPLE__
+#include <OpenGL/gl.h>
+#include <GLUT/glut.h>
+#else
+#ifdef _WIN32
+  #include <windows.h>
+#endif
+#include <GL/gl.h>
+#include <GL/glut.h>
+#endif
 
 int WindowPositionX = 200;
 int WindowPositionY = 100;
 int WindowWidth = 800;
 int WindowHeight = 600;
 char WindowTitle[] = "billiards";
-GLdouble vertex[][3] = {
-    { 0.0, 0.0, 0.0 },
-    { 2.0, 0.0, 0.0 },
-    { 2.0, 2.0, 0.0 },
-    { 0.0, 2.0, 0.0 },
-    { 0.0, 0.0, 30.0 },
-    { 2.0, 0.0, 30.0 },
-    { 2.0, 2.0, 30.0 },
-    { 0.0, 2.0, 30.0 }
-};
-int face[][4] = {
-    { 0, 1, 2, 3 },
-    { 1, 5, 6, 2 },
-    { 5, 4, 7, 6 },
-    { 4, 0, 3, 7 },
-    { 4, 5, 1, 0 },
-    { 3, 2, 6, 7 }
-};
 
 void init(void);
+
 void idle(void);
+
 void display(void);
+
 void ground(void);
+
 void table(void);
+
 void sphere(void);
 
-int main(int argc, char *argv[]){
+int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitWindowPosition(WindowPositionX, WindowPositionY);
     glutInitWindowSize(WindowWidth, WindowHeight);
@@ -45,20 +40,20 @@ int main(int argc, char *argv[]){
     return 0;
 }
 
-void init(void){
+void init(void) {
     glClearColor(1.0, 1.0, 1.0, 0.0);
     glEnable(GL_DEPTH_TEST);
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(30.0, (double)WindowWidth/(double)WindowHeight, 0.1, 1000.0);
+    gluPerspective(30.0, (double) WindowWidth / (double) WindowHeight, 0.1, 1000.0);
     gluLookAt(
-        0.0, -120.0, 50.0, // 視点の位置
-        0.0, 0.0, 10.0,     // 視界の中心位置の参照点座標
-        0.0, 0.0, 2.0);     // 視界の上方向のベクトル
+            0.0, -120.0, 50.0, // 視点の位置
+            0.0, 0.0, 10.0,     // 視界の中心位置の参照点座標
+            0.0, 0.0, 2.0);     // 視界の上方向のベクトル
 }
 
-void idle(void){
+void idle(void) {
     glutPostRedisplay();
 }
 
@@ -81,11 +76,11 @@ void ground(void) {
     double ground_max_y = 300.0;
     glColor3d(0.8, 0.8, 0.8);
     glBegin(GL_LINES);
-    for(double ly = -ground_max_y; ly <= ground_max_y; ly+=10.0){
+    for (double ly = -ground_max_y; ly <= ground_max_y; ly += 10.0) {
         glVertex3d(-ground_max_x, ly, 0);
         glVertex3d(ground_max_x, ly, 0);
     }
-    for(double lx = -ground_max_x; lx <= ground_max_x; lx+=10.0){
+    for (double lx = -ground_max_x; lx <= ground_max_x; lx += 10.0) {
         glVertex3d(lx, ground_max_y, 0);
         glVertex3d(lx, -ground_max_y, 0);
     }
@@ -93,34 +88,34 @@ void ground(void) {
 }
 
 //テーブル
-void table(void){
+void table(void) {
     GLdouble vertex[][3] = {
-        { -25.0, -50.0, -0.5 },
-        {  25.0, -50.0, -0.5 },
-        {  25.0,  50.0, -0.5 },
-        { -25.0,  50.0, -0.5 },
-        { -25.0, -50.0,  0.5 },
-        {  25.0, -50.0,  0.5 },
-        {  25.0,  50.0,  0.5 },
-        { -25.0,  50.0,  0.5 }
+            {-25.0, -50.0, -0.5},
+            {25.0,  -50.0, -0.5},
+            {25.0,  50.0,  -0.5},
+            {-25.0, 50.0,  -0.5},
+            {-25.0, -50.0, 0.5},
+            {25.0,  -50.0, 0.5},
+            {25.0,  50.0,  0.5},
+            {-25.0, 50.0,  0.5}
     };
     //面の定義
     int face[][4] = {
-        { 3, 2, 1, 0 },
-        { 1, 2, 6, 5 },
-        { 4, 5, 6, 7 },
-        { 0, 4, 7, 3 },
-        { 0, 1, 5, 4 },
-        { 2, 3, 7, 6 }
+            {3, 2, 1, 0},
+            {1, 2, 6, 5},
+            {4, 5, 6, 7},
+            {0, 4, 7, 3},
+            {0, 1, 5, 4},
+            {2, 3, 7, 6}
     };
     //面の法線ベクトル
     GLdouble normal[][3] = {
-        { 0.0, 0.0, -1.0 },
-        { 1.0, 0.0, 0.0 },
-        { 0.0, 0.0, 1.0 },
-        {-1.0, 0.0, 0.0 },
-        { 0.0,-1.0, 0.0 },
-        { 0.0, 1.0, 0.0 }
+            {0.0,  0.0,  -1.0},
+            {1.0,  0.0,  0.0},
+            {0.0,  0.0,  1.0},
+            {-1.0, 0.0,  0.0},
+            {0.0,  -1.0, 0.0},
+            {0.0,  1.0,  0.0}
     };
     glColor3d(0.5, 1.0, 0.5);
     glPushMatrix();
