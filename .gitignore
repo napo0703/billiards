@@ -1,5 +1,6 @@
 .DS_Store
-.idea
+.idea/workspace.xml
+.idea/tasks.xml
 CMakeCache.txt
 CMakeFiles
 CMakeScripts
@@ -8,3 +9,4 @@ cmake_install.cmake
 install_manifest.txt
 CTestTestfile.cmake
 billiards
+cmake-build-debug/
