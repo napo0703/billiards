@@ -22,8 +22,8 @@ const double TABLE_HEIGHT = 0.5;  // エプロンの高さ
 const double BALL_RADIUS = 0.2;   // ボールの半径
 const double TIMESCALE = 0.01;    // フレームごとの経過時間
 const double SPEED = 30.0;    // ボールの初速度
-const double MU = 0.8;        // テーブルとボールの摩擦係数
-const double WEIGHT = 1.0;    // ボールの質量
+const double MU = 3.0;        // テーブルとボールの摩擦係数
+const double WEIGHT = 5.0;    // ボールの質量
 const double CR = 0.8;        // エプロンの反発係数
 
 int windowHeight;       // ウィンドウの高さ
@@ -78,8 +78,8 @@ void drawTable(double height) {
     // テーブルの描画
     glNormal3d(0.0, 1.0, 0.0);
     int i, j;
-    for (j = (int) -TABLE_DEPTH; j < TABLE_DEPTH; ++j) {
-        for (i = (int) -TABLE_WIDTH; i < TABLE_WIDTH; ++i) {
+    for (j = (int) -TABLE_DEPTH; j < TABLE_DEPTH; j += 1) {
+        for (i = (int) -TABLE_WIDTH; i < TABLE_WIDTH; i += 1) {
             glMaterialfv(GL_FRONT, GL_DIFFUSE, tableColor[(i + j) & 1]);
             glVertex3d((GLdouble) i, height,(GLdouble) j);
             glVertex3d((GLdouble) i, height,(GLdouble) (j + 1));
@@ -90,7 +90,7 @@ void drawTable(double height) {
 
     // エプロンの描画
     glMaterialfv(GL_FRONT, GL_DIFFUSE, apronColor);
-    for (i = 0; i < 4; ++i) {
+    for (i = 0; i < 4; i += 1) {
         glNormal3dv(apron[i]);
         glVertex3dv(apron[i] + 3);
         glVertex3dv(apron[i + 1] + 3);
@@ -126,7 +126,7 @@ void display(void) {
         glutIdleFunc(0);
     }
 
-    ++frame;
+    frame += 1;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 隠面消去処理
     glLoadIdentity();   // 変換行列の初期化
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
@@ -179,8 +179,11 @@ void mouse(int button, int state, int x, int y) {
                 // TODO: ボールを打ち出す方向と速度を決定してアニメーションさせる
             } else {
                 // ボールの初速度
-                vx0 = 30.0;
-                vz0 = 50.0;
+                px0 = 0.0;
+                pz0 = 0.0;
+                frame = 0;
+                vx0 = 10.0;
+                vz0 = 30.0;
                 glutIdleFunc(idle);
             }
             break;
@@ -204,6 +207,7 @@ void init(void) {
     glEnable(GL_LIGHT0);
 }
 
+// ボールが真っ直ぐ進み続けた場合の現在位置からテーブル上での位置を計算する関数
 double calcCurrentPosition(double p, double size) {
     int nx = (int) (p / size);
     if ((int)((p + size) / (size * 2)) & 1) {
