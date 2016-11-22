@@ -13,18 +13,18 @@
 #include <GL/glut.h>
 #endif
 
-double PX = 0.0;    // ボールの初期位置
-double PY = 0.2;
-double PZ = 0.0;
-double TABLE_WIDTH = 3.0;   // テーブルの大きさ
-double TABLE_DEPTH = 6.0;
-double TABLE_HEIGHT = 0.5;  // エプロンの高さ
-double BALL_RADIUS = 0.2;   // ボールの半径
-double TIMESCALE = 0.01;    // フレームごとの経過時間
-double SPEED = 30.0;    // ボールの初速度
-double MU = 0.5;        // テーブルとボールの摩擦係数
-double WEIGHT = 1.0;    // ボールの質量
-double CR = 0.8;        // エプロンの反発係数
+const double PX = 0.0;    // ボールの初期位置
+const double PY = 0.2;
+const double PZ = 0.0;
+const double TABLE_WIDTH = 3.0;   // テーブルの大きさ
+const double TABLE_DEPTH = 6.0;
+const double TABLE_HEIGHT = 0.5;  // エプロンの高さ
+const double BALL_RADIUS = 0.2;   // ボールの半径
+const double TIMESCALE = 0.01;    // フレームごとの経過時間
+const double SPEED = 30.0;    // ボールの初速度
+const double MU = 0.5;        // テーブルとボールの摩擦係数
+const double WEIGHT = 1.0;    // ボールの質量
+const double CR = 0.8;        // エプロンの反発係数
 
 int windowHeight;       // ウィンドウの高さ
 int frame = 0;          // 現在のフレーム数
@@ -33,7 +33,7 @@ double px0 = PX;        // ボールの初期位置
 double py0 = PY;
 double pz0 = PZ;
 
-void drawGround();
+void drawGround(void);
 void drawTable(double height);
 void drawBall(void);
 void display(void);
@@ -43,7 +43,7 @@ void keyboard(unsigned char key, int x, int y);
 void mouse(int button, int state, int x, int y);
 void init(void);
 
-void drawGround() {
+void drawGround(void) {
     double ground_max_x = 300.0;
     double ground_max_z = 300.0;
     glColor3d(0.8, 0.8, 0.8);
@@ -109,28 +109,37 @@ void display(void) {
     static GLfloat lightpos[] = {3.0, 4.0, 5.0, 1.0};   // 光源の位置
     static GLfloat white[] = {0.9, 0.9, 0.9, 1.0}; // ボールの色
     double t = TIMESCALE * frame;   // 現在時刻
-    double v = exp(-MU * t / WEIGHT);   // ボールの速度比
-    double sp = exp((vx0 * vx0) + (vz0 * vz0)) * v;  // ボールの速度
-    printf("%f %f %f %f\n", v, vx0, vz0, sp);
+    double v = exp(-MU * t / WEIGHT);   // 初速に対しての現在速度の割合
+    double sp = sqrt((vx0 * vx0) + (vz0 * vz0)) * v;  // ボールの速さ
     double p = WEIGHT * (1.0 - v) / MU; // ボールの相対位置
-    // ボールの現在位置
-    double px = vx0 * p + px0;
-    double py = py0;
-    double pz = vz0 * p + pz0;
+    // ボールが真っ直ぐ進み続けた場合の現在位置
+    double px = (vx0 * p) + px0;
+    double pz = (vz0 * p) + pz0;
 
-    // TODO: ボールが壁の位置に来たら方向を変える
-    if (px <= BALL_RADIUS - TABLE_WIDTH || px >= TABLE_WIDTH - BALL_RADIUS) {
-        glutIdleFunc(0);
-        //px0 = -px0;
-    }
-
-    if (pz <= BALL_RADIUS -TABLE_DEPTH || pz >= TABLE_DEPTH - BALL_RADIUS) {
-        glutIdleFunc(0);
-        //pz0 = -pz0;
+    // テーブル上での位置
+    double tpx = px;
+    double tpz;
+    int n = (int) (pz / 5.8);
+    if ((int)((pz + 5.8) / 11.6) & 1) {
+        if (n & 1) {
+            printf("n = %d パタン1\n", n);
+            tpz = 5.8 - (pz - (5.8 * (int) (pz / 5.8)));
+        } else {
+            printf("n = %d パタン2\n", n);
+            tpz = -(pz - (5.8 * (int) (pz / 5.8)));
+        }
+    } else {
+        if (n & 1) {
+            printf("n = %d パタン3\n", n);
+            tpz = -5.8 + (pz - (5.8 * (int) (pz / 5.8)));
+        } else {
+            printf("n = %d パタン0\n", n);
+            tpz = pz - (5.8 * (int) (pz / 5.8));
+        }
     }
 
     // 速度が一定以下になったらアニメーションを止める
-    if (sp < 1.0) {
+    if (sp < 0.3) {
         glutIdleFunc(0);
     }
 
@@ -144,7 +153,7 @@ void display(void) {
     drawGround();
     drawTable(0.0);
     glPushMatrix();
-    glTranslated(px, py, pz);
+    glTranslated(tpx, py0, tpz);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
     drawBall();
     glPopMatrix();
@@ -186,9 +195,10 @@ void mouse(int button, int state, int x, int y) {
 
                 // TODO: ボールを打ち出す方向と速度を決定してアニメーションさせる
             } else {
-                vx0 = 1.0;
+                // ボールの初速度
+                vx0 = 0.0;
                 vy0 = 0.0;
-                vz0 = -2.0;
+                vz0 = 30.0;
                 glutIdleFunc(idle);
             }
             break;
