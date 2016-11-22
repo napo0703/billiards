@@ -22,7 +22,7 @@ const double TABLE_HEIGHT = 0.5;  // エプロンの高さ
 const double BALL_RADIUS = 0.2;   // ボールの半径
 const double TIMESCALE = 0.01;    // フレームごとの経過時間
 const double SPEED = 30.0;    // ボールの初速度
-const double MU = 0.5;        // テーブルとボールの摩擦係数
+const double MU = 0.8;        // テーブルとボールの摩擦係数
 const double WEIGHT = 1.0;    // ボールの質量
 const double CR = 0.8;        // エプロンの反発係数
 
@@ -41,6 +41,7 @@ void resize(int w, int h);
 void idle(void);
 void keyboard(unsigned char key, int x, int y);
 void mouse(int button, int state, int x, int y);
+double calcCurrentPosition(double p, double size);
 void init(void);
 
 void drawGround(void) {
@@ -117,26 +118,8 @@ void display(void) {
     double pz = (vz0 * p) + pz0;
 
     // テーブル上での位置
-    double tpx = px;
-    double tpz;
-    int n = (int) (pz / 5.8);
-    if ((int)((pz + 5.8) / 11.6) & 1) {
-        if (n & 1) {
-            printf("n = %d パタン1\n", n);
-            tpz = 5.8 - (pz - (5.8 * (int) (pz / 5.8)));
-        } else {
-            printf("n = %d パタン2\n", n);
-            tpz = -(pz - (5.8 * (int) (pz / 5.8)));
-        }
-    } else {
-        if (n & 1) {
-            printf("n = %d パタン3\n", n);
-            tpz = -5.8 + (pz - (5.8 * (int) (pz / 5.8)));
-        } else {
-            printf("n = %d パタン0\n", n);
-            tpz = pz - (5.8 * (int) (pz / 5.8));
-        }
-    }
+    double tpx = calcCurrentPosition(px, TABLE_WIDTH - BALL_RADIUS);
+    double tpz = calcCurrentPosition(pz, TABLE_DEPTH - BALL_RADIUS);
 
     // 速度が一定以下になったらアニメーションを止める
     if (sp < 0.3) {
@@ -196,9 +179,8 @@ void mouse(int button, int state, int x, int y) {
                 // TODO: ボールを打ち出す方向と速度を決定してアニメーションさせる
             } else {
                 // ボールの初速度
-                vx0 = 0.0;
-                vy0 = 0.0;
-                vz0 = 30.0;
+                vx0 = 30.0;
+                vz0 = 50.0;
                 glutIdleFunc(idle);
             }
             break;
@@ -220,6 +202,23 @@ void init(void) {
     //glCullFace(GL_BACK)
     glEnable(GL_LIGHTING);
     glEnable(GL_LIGHT0);
+}
+
+double calcCurrentPosition(double p, double size) {
+    int nx = (int) (p / size);
+    if ((int)((p + size) / (size * 2)) & 1) {
+        if (nx & 1) {
+            return size - (p - (size * (int) (p / size)));
+        } else {
+            return -(p - (size * (int) (p / size)));
+        }
+    } else {
+        if (nx & 1) {
+            return -size + (p - (size * (int) (p / size)));
+        } else {
+            return p - (size * (int) (p / size));
+        }
+    }
 }
 
 int main(int argc, char *argv[]) {
