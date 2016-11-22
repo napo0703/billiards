@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <math.h>
+#include <printf.h>
 
 #ifdef __APPLE__
 #include <OpenGL/gl.h>
@@ -15,14 +16,15 @@
 double PX = 0.0;    // ボールの初期位置
 double PY = 0.2;
 double PZ = 0.0;
-double TABLE_WIDTH = 3;   // テーブルの大きさ
-double TABLE_DEPTH = 6;
+double TABLE_WIDTH = 3.0;   // テーブルの大きさ
+double TABLE_DEPTH = 6.0;
 double TABLE_HEIGHT = 0.5;  // エプロンの高さ
 double BALL_RADIUS = 0.2;   // ボールの半径
 double TIMESCALE = 0.01;    // フレームごとの経過時間
 double SPEED = 30.0;    // ボールの初速度
 double MU = 0.5;        // テーブルとボールの摩擦係数
 double WEIGHT = 1.0;    // ボールの質量
+double CR = 0.8;        // エプロンの反発係数
 
 int windowHeight;       // ウィンドウの高さ
 int frame = 0;          // 現在のフレーム数
@@ -36,6 +38,7 @@ void drawTable(double height);
 void drawBall(void);
 void display(void);
 void resize(int w, int h);
+void idle(void);
 void keyboard(unsigned char key, int x, int y);
 void mouse(int button, int state, int x, int y);
 void init(void);
@@ -57,16 +60,11 @@ void drawGround() {
 }
 
 void drawTable(double height) {
-    // テーブルの色
     static GLfloat tableColor[][4] = {
             {0.3, 0.6, 0.3, 1.0},
             {0.0, 0.3, 0.0, 1.0}
     };
-
-    // エプロンの色
     static GLfloat apronColor[] = {0.4, 0.2, 0.1, 1.0};
-
-    // エプロンの形状
     static GLdouble apron[][9] = {
             { 0.0, 0.0,  1.0, -TABLE_WIDTH, 0.0, -TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH},
             {-1.0, 0.0,  0.0,  TABLE_WIDTH, 0.0, -TABLE_DEPTH,  TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH},
@@ -74,7 +72,6 @@ void drawTable(double height) {
             { 1.0, 0.0,  0.0, -TABLE_WIDTH, 0.0,  TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT,  TABLE_DEPTH},
             { 0.0, 0.0,  1.0, -TABLE_WIDTH, 0.0, -TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH}
     };
-
     glBegin(GL_QUADS);
 
     // テーブルの描画
@@ -103,7 +100,6 @@ void drawTable(double height) {
     glEnd();
 }
 
-
 void drawBall(void) {
     glutSolidSphere(BALL_RADIUS, 20, 20);  // 半径, Z軸まわりの分割数, Z軸に沿った分割数
     glEnd();
@@ -114,6 +110,8 @@ void display(void) {
     static GLfloat white[] = {0.9, 0.9, 0.9, 1.0}; // ボールの色
     double t = TIMESCALE * frame;   // 現在時刻
     double v = exp(-MU * t / WEIGHT);   // ボールの速度比
+    double sp = exp((vx0 * vx0) + (vz0 * vz0)) * v;  // ボールの速度
+    printf("%f %f %f %f\n", v, vx0, vz0, sp);
     double p = WEIGHT * (1.0 - v) / MU; // ボールの相対位置
     // ボールの現在位置
     double px = vx0 * p + px0;
@@ -121,7 +119,20 @@ void display(void) {
     double pz = vz0 * p + pz0;
 
     // TODO: ボールが壁の位置に来たら方向を変える
-    // TODO: 速度が一定以下になったらアニメーションを止める
+    if (px <= BALL_RADIUS - TABLE_WIDTH || px >= TABLE_WIDTH - BALL_RADIUS) {
+        glutIdleFunc(0);
+        //px0 = -px0;
+    }
+
+    if (pz <= BALL_RADIUS -TABLE_DEPTH || pz >= TABLE_DEPTH - BALL_RADIUS) {
+        glutIdleFunc(0);
+        //pz0 = -pz0;
+    }
+
+    // 速度が一定以下になったらアニメーションを止める
+    if (sp < 1.0) {
+        glutIdleFunc(0);
+    }
 
     ++frame;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 隠面消去処理
@@ -148,6 +159,10 @@ void resize(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
 }
 
+void idle(void) {
+    glutPostRedisplay();
+}
+
 void keyboard(unsigned char key, int x, int y) {
     if (key == '\033' || key == 'q') {
         exit(0);
@@ -158,12 +173,30 @@ void mouse(int button, int state, int x, int y) {
     switch (button) {
         case GLUT_LEFT_BUTTON:
             if (state == GLUT_DOWN) {
+//                GLdouble model[16], proj[16];
+//                GLint view[4];
+//                GLfloat z;
+//                GLdouble ox, oy, oz;
+//                frame = 0;
+//                glGetDoublev(GL_MODELVIEW_MATRIX, model);
+//                glGetDoublev(GL_PROJECTION_MATRIX, proj);
+//                glGetIntegerv(GL_VIEWPORT, view);
+//                glReadPixels(x, windowHeight - y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z);
+//                gluUnProject(x, windowHeight - y, z, model, proj, view, &ox, &oy, &oz);
+
                 // TODO: ボールを打ち出す方向と速度を決定してアニメーションさせる
-                break;
+            } else {
+                vx0 = 1.0;
+                vy0 = 0.0;
+                vz0 = -2.0;
+                glutIdleFunc(idle);
             }
+            break;
         case GLUT_MIDDLE_BUTTON:
             break;
         case GLUT_RIGHT_BUTTON:
+            glutIdleFunc(0);
+            //glutPostRedisplay();
             break;
         default:
             break;
