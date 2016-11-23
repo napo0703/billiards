@@ -32,6 +32,8 @@ double vx0, vy0, vz0;   // ボールの初速度
 double px0 = PX;        // ボールの初期位置
 double py0 = PY;
 double pz0 = PZ;
+double tpx = px0;
+double tpz = pz0;
 
 void drawGround(void);
 void drawTable(double height);
@@ -41,7 +43,7 @@ void resize(int w, int h);
 void idle(void);
 void keyboard(unsigned char key, int x, int y);
 void mouse(int button, int state, int x, int y);
-double calcCurrentPosition(double p, double size);
+double calcCurrentPosition(double v0, double p, double size);
 void init(void);
 
 void drawGround(void) {
@@ -118,8 +120,8 @@ void display(void) {
     double pz = (vz0 * p) + pz0;
 
     // テーブル上での位置
-    double tpx = calcCurrentPosition(px, TABLE_WIDTH - BALL_RADIUS);
-    double tpz = calcCurrentPosition(pz, TABLE_DEPTH - BALL_RADIUS);
+    tpx = calcCurrentPosition(vx0, px, TABLE_WIDTH - BALL_RADIUS);
+    tpz = calcCurrentPosition(vz0, pz, TABLE_DEPTH - BALL_RADIUS);
 
     // 速度が一定以下になったらアニメーションを止める
     if (sp < 0.3) {
@@ -179,11 +181,11 @@ void mouse(int button, int state, int x, int y) {
                 // TODO: ボールを打ち出す方向と速度を決定してアニメーションさせる
             } else {
                 // ボールの初速度
-                px0 = 0.0;
-                pz0 = 0.0;
+                px0 = tpx;
+                pz0 = tpz;
                 frame = 0;
-                vx0 = 10.0;
-                vz0 = 30.0;
+                vx0 = -10.0;
+                vz0 = -30.0;
                 glutIdleFunc(idle);
             }
             break;
@@ -208,19 +210,36 @@ void init(void) {
 }
 
 // ボールが真っ直ぐ進み続けた場合の現在位置からテーブル上での位置を計算する関数
-double calcCurrentPosition(double p, double size) {
-    int nx = (int) (p / size);
-    if ((int)((p + size) / (size * 2)) & 1) {
-        if (nx & 1) {
-            return size - (p - (size * (int) (p / size)));
+double calcCurrentPosition(double v0, double p, double size) {
+    int nx = v0 >= 0 ? (int) (p / size) : (int) (-p / size);
+    if (v0 >= 0) {
+        nx = (int) (p / size);
+        if ((int) ((p + size) / (size * 2)) & 1) {
+            if (nx & 1) {
+                return size - (p - (size * (int) (p / size)));
+            } else {
+                return -(p - (size * (int) (p / size)));
+            }
         } else {
-            return -(p - (size * (int) (p / size)));
+            if (nx & 1) {
+                return -size + (p - (size * (int) (p / size)));
+            } else {
+                return p - (size * (int) (p / size));
+            }
         }
     } else {
-        if (nx & 1) {
-            return -size + (p - (size * (int) (p / size)));
+        if ((int) ((-p + size) / (size * 2)) & 1) {
+            if (nx & 1) {
+                return -size - (p + (size * (int) (-p / size)));
+            } else {
+                return -(p + (size * (int) (-p / size)));
+            }
         } else {
-            return p - (size * (int) (p / size));
+            if (nx & 1) {
+                return size + (p + (size * (int) (-p / size)));
+            } else {
+                return p + (size * (int) (-p / size));
+            }
         }
     }
 }
