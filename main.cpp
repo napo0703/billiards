@@ -16,9 +16,10 @@
 const double PX = 0.0;    // ボールの初期位置
 const double PY = 0.2;
 const double PZ = 0.0;
-const double TABLE_WIDTH = 3.0;   // テーブルの大きさ
-const double TABLE_DEPTH = 6.0;
-const double TABLE_HEIGHT = 0.5;  // エプロンの高さ
+const double TABLE_WIDTH = 3.2;   // テーブルの大きさ
+const double TABLE_DEPTH = 5.8;
+const double APRON_HEIGHT = 0.4;  // エプロンの高さ
+const double APRON_WIDTH = 0.3;
 const double BALL_RADIUS = 0.2;   // ボールの半径
 const double TIMESCALE = 0.01;    // フレームごとの経過時間
 const double SPEED = 30.0;    // ボールの初速度
@@ -46,6 +47,49 @@ void mouse(int button, int state, int x, int y);
 double calcCurrentPosition(double v0, double p, double size);
 void init(void);
 
+void drawBox(double x, double y, double z, GLfloat color[]) {
+    // 直方体の定義
+    GLdouble vertex[][3] = {
+            { 0, 0, 0 },
+            { x, 0, 0 },
+            { x, y, 0 },
+            { 0, y, 0 },
+            { 0, 0, z },
+            { x, 0, z },
+            { x, y, z },
+            { 0, y, z }
+    };
+
+    const static int face[][4] = {
+            { 0, 1, 2, 3 },
+            { 1, 5, 6, 2 },
+            { 5, 4, 7, 6 },
+            { 4, 0, 3, 7 },
+            { 4, 5, 1, 0 },
+            { 3, 2, 6, 7 }
+    };
+
+    const static GLdouble normal[][3] = {
+            { 0.0, 0.0,-1.0 },
+            { 1.0, 0.0, 0.0 },
+            { 0.0, 0.0, 1.0 },
+            {-1.0, 0.0, 0.0 },
+            { 0.0,-1.0, 0.0 },
+            { 0.0, 1.0, 0.0 }
+    };
+
+    glMaterialfv(GL_FRONT, GL_DIFFUSE, color);
+    glBegin(GL_QUADS);
+    int i, j;
+    for (j = 0; j < 6; j += 1) {
+        glNormal3dv(normal[j]);
+        for (i = 0; i < 4; i += 1) {
+            glVertex3dv(vertex[face[j][i]]);
+        }
+    }
+    glEnd();
+}
+
 void drawGround(void) {
     double ground_max_x = 300.0;
     double ground_max_z = 300.0;
@@ -62,43 +106,33 @@ void drawGround(void) {
     glEnd();
 }
 
-void drawTable(double height) {
-    static GLfloat tableColor[][4] = {
-            {0.3, 0.6, 0.3, 1.0},
-            {0.0, 0.3, 0.0, 1.0}
-    };
-    static GLfloat apronColor[] = {0.4, 0.2, 0.1, 1.0};
-    static GLdouble apron[][9] = {
-            { 0.0, 0.0,  1.0, -TABLE_WIDTH, 0.0, -TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH},
-            {-1.0, 0.0,  0.0,  TABLE_WIDTH, 0.0, -TABLE_DEPTH,  TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH},
-            { 0.0, 0.0, -1.0,  TABLE_WIDTH, 0.0,  TABLE_DEPTH,  TABLE_WIDTH, TABLE_HEIGHT,  TABLE_DEPTH},
-            { 1.0, 0.0,  0.0, -TABLE_WIDTH, 0.0,  TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT,  TABLE_DEPTH},
-            { 0.0, 0.0,  1.0, -TABLE_WIDTH, 0.0, -TABLE_DEPTH, -TABLE_WIDTH, TABLE_HEIGHT, -TABLE_DEPTH}
-    };
-    glBegin(GL_QUADS);
+void drawTable() {
+    GLfloat tableColor[] = {0.0, 0.35, 0.14, 1.0};
+    GLfloat apronColor[] = {0.4, 0.2, 0.1, 1.0};
 
-    // テーブルの描画
-    glNormal3d(0.0, 1.0, 0.0);
-    int i, j;
-    for (j = (int) -TABLE_DEPTH; j < TABLE_DEPTH; j += 1) {
-        for (i = (int) -TABLE_WIDTH; i < TABLE_WIDTH; i += 1) {
-            glMaterialfv(GL_FRONT, GL_DIFFUSE, tableColor[(i + j) & 1]);
-            glVertex3d((GLdouble) i, height,(GLdouble) j);
-            glVertex3d((GLdouble) i, height,(GLdouble) (j + 1));
-            glVertex3d((GLdouble) (i + 1), height,(GLdouble) (j + 1));
-            glVertex3d((GLdouble) (i + 1), height,(GLdouble) j);
-        }
-    }
+    // テーブル
+    glPushMatrix();
+    glTranslated(-TABLE_WIDTH, -0.11, -TABLE_DEPTH);
+    drawBox(TABLE_WIDTH * 2, 0.1, TABLE_DEPTH *2, tableColor);
+    glPopMatrix();
 
-    // エプロンの描画
-    glMaterialfv(GL_FRONT, GL_DIFFUSE, apronColor);
-    for (i = 0; i < 4; i += 1) {
-        glNormal3dv(apron[i]);
-        glVertex3dv(apron[i] + 3);
-        glVertex3dv(apron[i + 1] + 3);
-        glVertex3dv(apron[i + 1] + 6);
-        glVertex3dv(apron[i] + 6);
-    }
+    // エプロン
+    glPushMatrix();
+    glTranslated(-(TABLE_WIDTH + APRON_WIDTH), -0.1, -(TABLE_DEPTH + APRON_HEIGHT));
+    drawBox((TABLE_WIDTH * 2) + (APRON_WIDTH * 2), APRON_HEIGHT, APRON_HEIGHT, apronColor);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslated(-(TABLE_WIDTH + APRON_WIDTH), -0.1, TABLE_DEPTH);
+    drawBox((TABLE_WIDTH * 2) + (APRON_WIDTH * 2), APRON_HEIGHT, APRON_HEIGHT, apronColor);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslated(-(TABLE_WIDTH + APRON_WIDTH), -0.1, -TABLE_DEPTH);
+    drawBox(APRON_WIDTH, APRON_HEIGHT, TABLE_DEPTH * 2, apronColor);
+    glPopMatrix();
+    glPushMatrix();
+    glTranslated(TABLE_WIDTH, -0.1, -TABLE_DEPTH);
+    drawBox(APRON_WIDTH, APRON_HEIGHT, TABLE_DEPTH * 2, apronColor);
+    glPopMatrix();
 
     glEnd();
 }
@@ -119,6 +153,8 @@ void display(void) {
     double px = (vx0 * p) + px0;
     double pz = (vz0 * p) + pz0;
 
+    // TODO: エプロンにぶつかったらスピードを落とす
+
     // テーブル上での位置
     tpx = calcCurrentPosition(vx0, px, TABLE_WIDTH - BALL_RADIUS);
     tpz = calcCurrentPosition(vz0, pz, TABLE_DEPTH - BALL_RADIUS);
@@ -132,11 +168,11 @@ void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // 隠面消去処理
     glLoadIdentity();   // 変換行列の初期化
     glLightfv(GL_LIGHT0, GL_POSITION, lightpos);
-    glTranslated(0.0, 0.0, -20.0);
-    glRotated(30.0, 1.0, 0.0, 0.0);
+    glTranslated(0.0, 0.0, -15.0);
+    glRotated(20.0, 0.0, 0.0, 0.0);
 
     drawGround();
-    drawTable(0.0);
+    drawTable();
     glPushMatrix();
     glTranslated(tpx, py0, tpz);
     glMaterialfv(GL_FRONT, GL_DIFFUSE, white);
@@ -201,6 +237,7 @@ void mouse(int button, int state, int x, int y) {
 }
 
 void init(void) {
+    drawTable();
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glEnable(GL_DEPTH_TEST);    // デプス・バッファ
     //glEnable(GL_CULL_FACE);   // カリング
