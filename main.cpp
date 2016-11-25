@@ -25,7 +25,7 @@ const double TIMESCALE = 0.01;    // フレームごとの経過時間
 const double SPEED = 30.0;    // ボールの初速度
 const double MU = 3.0;        // テーブルとボールの摩擦係数
 const double WEIGHT = 5.0;    // ボールの質量
-const double CR = 0.8;        // エプロンの反発係数
+const double CR = 0.9;        // エプロンの反発係数
 const double WIDTH_RANGE = TABLE_WIDTH - BALL_RADIUS;
 const double DEPTH_RANGE = TABLE_DEPTH - BALL_RADIUS;
 
@@ -163,16 +163,16 @@ void display(void) {
     if (px >= WIDTH_RANGE || px <= -WIDTH_RANGE) {
         px0 = px >= WIDTH_RANGE ? WIDTH_RANGE : -WIDTH_RANGE;
         pz0 = pz;
-        vx0 = -(vx0 * v);
-        vz0 = vz0 * v;
+        vx0 = -(vx0 * v) * CR;
+        vz0 = vz0 * v * CR;
         frame = 0;
     }
 
     if (pz >= DEPTH_RANGE || pz <= -DEPTH_RANGE) {
         px0 = px;
         pz0 = pz >= DEPTH_RANGE ? DEPTH_RANGE : -DEPTH_RANGE;
-        vx0 = vx0 * v;
-        vz0 = -(vz0 * v);
+        vx0 = vx0 * v * CR;
+        vz0 = -(vz0 * v) * CR;
         frame = 0;
     }
 
